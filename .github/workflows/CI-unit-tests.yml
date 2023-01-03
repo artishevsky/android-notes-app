@@ -1,8 +1,12 @@
-name: CI - run unit tests
+name: CI / Run unit tests
 
 on:
   push:
     branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   run:
@@ -11,20 +15,20 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: setup JDK
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
           cache: 'gradle'
 
-      - name: run unit tests
+      - name: Run unit tests
         run: ./gradlew test --no-daemon
 
-      - name: upload report as artifact
+      - name: Upload reports to artifacts
         uses: actions/upload-artifact@v3
         with:
           name: unit-tests-report
