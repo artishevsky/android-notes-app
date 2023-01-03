@@ -1,0 +1,31 @@
+name: CI - run unit tests
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  run:
+    continue-on-error: false
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: run unit tests
+        run: ./gradlew test --no-daemon
+
+      - name: upload report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-tests-report
+          path: ./**/build/reports/tests/
